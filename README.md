@@ -12,6 +12,4 @@
 ## Getting Started
 
 1. **Clone** this repo
-2. Copy your `.env` file with:
-   ```bash
-   cp .env.example .env
+2. Edit the `.env` file by updating it with your Linkedin credentials

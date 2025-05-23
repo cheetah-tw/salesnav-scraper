@@ -1,0 +1,43 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pyinstaller openpyxl python-dotenv selenium
+
+      - name: Build macOS binary
+        run: |
+          python3 -m PyInstaller \
+            --onefile \
+            --name SalesNavTitlesMac \
+            --icon assets/myicon.ico \
+            src/script.py
+
+      - name: Prepare zip bundle
+        run: |
+          mkdir bundle
+          cp dist/SalesNavTitlesMac bundle/
+          cp .env.example bundle/
+          cp data/links.xlsx bundle/
+          zip -r SalesNavTitles-macos.zip bundle/*
+
+      - name: Upload macOS bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: salesnavtitles-macos
+          path: SalesNavTitles-macos.zip
