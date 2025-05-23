@@ -1,0 +1,15 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# Env & local data
+.env
+data/
+
+# Build artifacts
+build/
+dist/
+*.spec
