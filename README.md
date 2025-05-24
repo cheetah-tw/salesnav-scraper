@@ -18,7 +18,7 @@
 
 ## 📺 Quick Start Tutorial
 
-Click the image below to watch a quick walkthrough of the SalesNavTitles tool:
+Click the image below to watch a quick walkthrough of the SalesNavTitles tool (or right-click and Open in New Tab to keep this Github page open):
 
 <a href="https://drive.google.com/file/d/1OsjUrcXwUTtN7untUJFR9sVdgj14jx2-/view?usp=sharing"
    target="_blank" rel="noopener noreferrer">
