@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,17 +23,13 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller \
-            --onefile \
-            --name SalesNavTitles \
-            --icon assets/myicon.ico \
-            src/salesnav_position.py
+          python -m PyInstaller --onefile --name SalesNavTitles --icon assets/myicon.ico src/salesnav_position.py
 
       - name: Prepare zip bundle
         run: |
           mkdir bundle
           copy dist\SalesNavTitles.exe bundle\
-          copy .env bundle\
+          copy .env.example bundle\
           copy data\links.xlsx bundle\
           powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavTitles-windows.zip
 
