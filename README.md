@@ -18,6 +18,6 @@
 
 ## 📺 Quick Start Tutorial
 
-Click the image below to watch a 2-minute walkthrough of SalesNavTitles:
+Click the image below to watch a quick walkthrough of the SalesNavTitles tool:
 
 [![Watch the tutorial](assets/tutorial-thumb.png)](https://drive.google.com/file/d/1OsjUrcXwUTtN7untUJFR9sVdgj14jx2-/view?usp=sharing)
