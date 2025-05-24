@@ -6,8 +6,13 @@ __pycache__/
 .vscode/
 
 # Env & local data
-.env
-data/
+!.env          # still ignore the *real* .env
+
+# Data folder
+# ignore everything under data except links.xlsx
+data/*
+!data/links.xlsx
+
 
 # Build artifacts
 build/
