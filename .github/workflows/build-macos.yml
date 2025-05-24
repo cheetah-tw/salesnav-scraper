@@ -19,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pyinstaller openpyxl python-dotenv selenium
+          python -m pip install --upgrade pyinstaller openpyxl python-dotenv selenium pandas numpy
 
       - name: Build macOS binary
         run: |
