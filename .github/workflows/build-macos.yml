@@ -31,7 +31,9 @@ jobs:
           cp dist/SalesNavTitlesMac bundle/
           cp .env bundle/
           cp data/links.xlsx bundle/
-          zip -r SalesNavTitles-macos.zip bundle/*
+          # Zip the entire folder, including dot-files
+          zip -r SalesNavTitles-macos.zip bundle
+
 
       - name: Upload macOS bundle
         uses: actions/upload-artifact@v4
