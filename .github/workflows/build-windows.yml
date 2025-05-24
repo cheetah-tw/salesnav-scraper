@@ -26,7 +26,7 @@ jobs:
             --onefile \
             --name SalesNavTitles \
             --icon assets/myicon.ico \
-            src/script.py
+            src/salesnav_position.py
 
       - name: Prepare zip bundle
         run: |
@@ -37,7 +37,7 @@ jobs:
           powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavTitles-windows.zip
 
       - name: Upload Windows bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: salesnavtitles-windows
           path: SalesNavTitles-windows.zip
