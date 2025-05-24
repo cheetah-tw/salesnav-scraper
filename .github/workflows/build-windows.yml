@@ -23,7 +23,9 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller --onefile --name SalesNavTitles --icon assets/myicon.ico src/salesnav_position.py
+          python -m PyInstaller --onefile --name SalesNavTitles \
+            --icon assets/scraper.ico \
+            src/salesnav_position.py
 
       - name: Prepare zip bundle
         run: |

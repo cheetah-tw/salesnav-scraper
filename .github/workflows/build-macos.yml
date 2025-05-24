@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,17 +23,15 @@ jobs:
 
       - name: Build macOS binary
         run: |
-          python3 -m PyInstaller \
-            --onefile \
-            --name SalesNavTitlesMac \
-            --icon assets/myicon.ico \
+          python3 -m PyInstaller --onefile --name SalesNavTitlesMac \
+            --icon assets/scraper.ico \
             src/salesnav_position.py
 
       - name: Prepare zip bundle
         run: |
           mkdir bundle
           cp dist/SalesNavTitlesMac bundle/
-          cp .env bundle/
+          cp .env.example bundle/
           cp data/links.xlsx bundle/
           zip -r SalesNavTitles-macos.zip bundle/*
 
