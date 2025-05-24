@@ -23,15 +23,13 @@ jobs:
 
       - name: Build macOS binary
         run: |
-          python3 -m PyInstaller --onefile --name SalesNavTitlesMac \
-            --icon assets/scraper.ico \
-            src/salesnav_position.py
+          python3 -m PyInstaller --onefile --name SalesNavTitlesMac --icon assets/scraper.icns src/salesnav_position.py
 
       - name: Prepare zip bundle
         run: |
           mkdir bundle
           cp dist/SalesNavTitlesMac bundle/
-          cp .env.example bundle/
+          cp .env bundle/
           cp data/links.xlsx bundle/
           zip -r SalesNavTitles-macos.zip bundle/*
 
