@@ -20,4 +20,7 @@
 
 Click the image below to watch a quick walkthrough of the SalesNavTitles tool:
 
-[![Watch the tutorial](assets/tutorial-thumb.png)](https://drive.google.com/file/d/1OsjUrcXwUTtN7untUJFR9sVdgj14jx2-/view?usp=sharing)
+<a href="https://drive.google.com/file/d/FILE_ID/view?usp=sharing"
+   target="_blank" rel="noopener noreferrer">
+  <img src="assets/tutorial-thumb.png" alt="Watch the tutorial" />
+</a>
