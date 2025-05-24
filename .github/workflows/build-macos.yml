@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir bundle
           cp dist/SalesNavTitlesMac bundle/
-          cp .env.example bundle/
+          cp .env bundle/
           cp data/links.xlsx bundle/
           zip -r SalesNavTitles-macos.zip bundle/*
 

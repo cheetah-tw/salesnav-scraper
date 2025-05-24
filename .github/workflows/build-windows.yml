@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir bundle
           copy dist\SalesNavTitles.exe bundle\
-          copy .env.example bundle\
+          copy .env bundle\
           copy data\links.xlsx bundle\
           powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavTitles-windows.zip
 
