@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir bundle
           cp dist/SalesNavTitlesMac bundle/
-          cp .env bundle/
+          cp cred.env bundle/
           cp data/links.xlsx bundle/
           # Zip the entire folder, including dot-files
           zip -r SalesNavTitles-macos.zip bundle

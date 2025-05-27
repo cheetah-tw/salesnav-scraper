@@ -12,9 +12,9 @@
 ## Getting Started
 
 1. **Download** either the Windows or MacOS ZIP file based on your operating system
-2. Edit the `.env` file by updating it with your Linkedin credentials (you can use any simple text editor)
-3. Edit the `links.xlsx` file with your list of Linkedin Sales Navigator profile links
-4. Run the executable/app
+2. **Edit** the `.env` file by updating it with your Linkedin credentials (you can use any simple text editor)
+3. **Edit** the `links.xlsx` file with your list of Linkedin Sales Navigator profile links
+4. **Run** the executable/app
 
 ## 📺 Quick Start Tutorial
 

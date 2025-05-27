@@ -6,7 +6,7 @@ __pycache__/
 .vscode/
 
 # Env & local data
-!.env          # still ignore the *real* .env
+!cred.env          # still ignore the *real* .env
 
 # Data folder
 # ignore everything under data except links.xlsx

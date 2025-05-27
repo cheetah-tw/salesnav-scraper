@@ -37,7 +37,7 @@ def main():
     DELAY_BETWEEN = 2
 
     # Load credentials
-    load_dotenv(resource_path(".env"))
+    load_dotenv(resource_path("cred.env"))
     EMAIL = os.getenv("LINKEDIN_EMAIL")
     PASSWORD = os.getenv("LINKEDIN_PASSWORD")
 
