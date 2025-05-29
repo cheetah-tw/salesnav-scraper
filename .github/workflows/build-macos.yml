@@ -23,20 +23,20 @@ jobs:
 
       - name: Build macOS binary
         run: |
-          python3 -m PyInstaller --onefile --name SalesNavTitlesMac --icon assets/scraper.icns src/salesnav_position.py
+          python3 -m PyInstaller --onefile --name SalesNavScraperMac --icon assets/scraper.icns src/salesnav_scraper.py
 
       - name: Prepare zip bundle
         run: |
           mkdir bundle
-          cp dist/SalesNavTitlesMac bundle/
+          cp dist/SalesNavScraperMac bundle/
           cp cred.env bundle/
           cp data/links.xlsx bundle/
           # Zip the entire folder, including dot-files
-          zip -r SalesNavTitles-macos.zip bundle
+          zip -r SalesNavScraper-macos.zip bundle
 
 
       - name: Upload macOS bundle
         uses: actions/upload-artifact@v4
         with:
-          name: salesnavtitles-macos
-          path: SalesNavTitles-macos.zip
+          name: salesnavscraper-macos
+          path: SalesNavScraper-macos.zip

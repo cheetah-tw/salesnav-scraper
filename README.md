@@ -1,11 +1,12 @@
-# SalesNav Scraper
+# SalesNav Prospect Info Scraper
 
-> A cross-platform LinkedIn Sales Navigator profile Title scraper.
+> A cross-platform LinkedIn Sales Navigator profile information scraper.
 > Outputs both CSV and XLSX.
 
 ## Features
 
 - Headless scraping via Selenium
+- Obtains prospect full name, position title, current company, and company Sales Nav link
 - Bundles into a single EXE (Windows) or Mach-O binary (macOS)
 - Converts results to both **.csv** and **.xlsx**
 

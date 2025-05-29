@@ -24,18 +24,18 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller --onefile --name SalesNavTitles --icon assets/scraper.ico src/salesnav_position.py
+          python -m PyInstaller --onefile --name SalesNavScraper --icon assets/scraper.ico src/salesnav_scraper.py
 
       - name: Prepare zip bundle
         run: |
           mkdir bundle
-          copy dist\SalesNavTitles.exe bundle\
+          copy dist\SalesNavScraper.exe bundle\
           copy cred.env bundle\
           copy data\links.xlsx bundle\
-          powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavTitles-windows.zip
+          powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavScraper-windows.zip
 
       - name: Upload Windows bundle
         uses: actions/upload-artifact@v4
         with:
-          name: salesnavtitles-windows
-          path: SalesNavTitles-windows.zip
+          name: salesnavscraper-windows
+          path: SalesNavScraper-windows.zip
