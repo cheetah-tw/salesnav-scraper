@@ -26,7 +26,7 @@ def main():
     # ——————————
     # CONFIGURATION
     # ——————————
-    EXCEL_INPUT = resource_path(os.path.join("..", "data", "links.xlsx"))
+    EXCEL_INPUT = resource_path("links.xlsx")
     OUTPUT_CSV = "salesnav_prospects.csv"
     OUTPUT_XLSX = "salesnav_prospects.xlsx"
     LOAD_TIMEOUT = 10
@@ -34,7 +34,7 @@ def main():
     DELAY_BETWEEN = 2
 
     # Load credentials from cred.env (at repo root)
-    dotenv_path = resource_path(os.path.join("..", "cred.env"))
+    dotenv_path = resource_path("cred.env")
     if not os.path.exists(dotenv_path):
         raise FileNotFoundError(f"Credentials file not found: {dotenv_path}")
     load_dotenv(dotenv_path)
