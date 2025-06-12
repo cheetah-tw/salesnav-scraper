@@ -27,13 +27,15 @@ def main():
     # CONFIGURATION
     # ——————————
     EXCEL_INPUT = resource_path("links.xlsx")
-    OUTPUT_CSV = "salesnav_prospects.csv"
-    OUTPUT_XLSX = "salesnav_prospects.xlsx"
+    OUTPUT_CSV_LONG = "salesnav_prospects_long.csv"
+    OUTPUT_XLSX_LONG = "salesnav_prospects_long.xlsx"
+    OUTPUT_CSV_WIDE = "salesnav_prospects_wide.csv"
+    OUTPUT_XLSX_WIDE = "salesnav_prospects_wide.xlsx"
     LOAD_TIMEOUT = 10
     PAGE_TIMEOUT = 15
     DELAY_BETWEEN = 2
 
-    # Load credentials from cred.env (at repo root)
+    # Load credentials from cred.env
     dotenv_path = resource_path("cred.env")
     if not os.path.exists(dotenv_path):
         raise FileNotFoundError(f"Credentials file not found: {dotenv_path}")
@@ -58,43 +60,43 @@ def main():
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
     time.sleep(3)
 
-    # Load links from data/links.xlsx
+    # Load profile URLs
     df_links = pd.read_excel(EXCEL_INPUT, header=0)
     links = df_links.iloc[:, 0].astype(str).tolist()
 
-    results = []
+    long_results = []
 
-    # Scrape each profile
-    for url in links:
+    # Scrape each profile in original order
+    for idx, url in enumerate(links):
         val = url.strip()
-        print(f"Processing: {val}")
+        print(f"Processing ({idx}): {val}")
 
+        # Handle explicit "no prospect" entries
         if val.lower() == "no prospect linkedin":
-            results.append(
-                {
-                    "Full Name": val,
-                    "Profile URL": val,
-                    "Current Title": val,
-                    "Company": val,
-                    "Company Link": val,
-                }
-            )
+            long_results.append({
+                "ScanOrder": idx,
+                "Full Name": val,
+                "Profile URL": val,
+                "Title": val,
+                "Company": val,
+                "Link": val,
+            })
             time.sleep(DELAY_BETWEEN)
             continue
 
+        # Load the page
         try:
             driver.get(val)
         except (TimeoutException, WebDriverException) as e:
             print(f"  → Page load failed: {e}")
-            results.append(
-                {
-                    "Full Name": val,
-                    "Profile URL": val,
-                    "Current Title": "Page Load Timeout",
-                    "Company": "Page Load Timeout",
-                    "Company Link": "",
-                }
-            )
+            long_results.append({
+                "ScanOrder": idx,
+                "Full Name": val,
+                "Profile URL": val,
+                "Title": "Page Load Timeout",
+                "Company": "Page Load Timeout",
+                "Link": "",
+            })
             time.sleep(DELAY_BETWEEN)
             continue
 
@@ -112,82 +114,93 @@ def main():
             full_name = "No name found"
 
         # ——————————
-        # CURRENT TITLE
+        # SCRAPE ALL CURRENT ROLES
         # ——————————
         try:
-            title_elem = wait.until(
+            container = wait.until(
                 EC.visibility_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "div[data-sn-view-name='lead-current-role'] "
-                        "span[data-anonymize='job-title']",
-                    )
+                    (By.CSS_SELECTOR, "div[data-sn-view-name='lead-current-role']")
                 )
             )
-            current_title = title_elem.text.strip() or "No title found"
+            titles = container.find_elements(By.CSS_SELECTOR, "span[data-anonymize='job-title']")
+            companies = container.find_elements(By.CSS_SELECTOR, "a[data-anonymize='company-name']")
         except Exception:
-            current_title = "Error or Not Found"
+            titles = []
+            companies = []
 
-        # ——————————
-        # COMPANY NAME & LINK
-        # ——————————
-        try:
-            comp_elem = wait.until(
-                EC.visibility_of_element_located(
-                    (
-                        By.CSS_SELECTOR,
-                        "div[data-sn-view-name='lead-current-role'] "
-                        "a[data-anonymize='company-name']",
-                    )
-                )
-            )
-            company = comp_elem.text.strip()
-            company_link = comp_elem.get_attribute("href")
-        except Exception:
-            company = "No company found"
-            company_link = ""
-
-        results.append(
-            {
+        # If none found, still emit one row
+        if not titles:
+            long_results.append({
+                "ScanOrder": idx,
                 "Full Name": full_name,
                 "Profile URL": val,
-                "Current Title": current_title,
-                "Company": company,
-                "Company Link": company_link,
-            }
-        )
+                "Title": "No title found",
+                "Company": "No company found",
+                "Link": "",
+            })
+        else:
+            for i, t in enumerate(titles):
+                job = t.text.strip() or "No title found"
+                if i < len(companies):
+                    c = companies[i]
+                    comp_name = c.text.strip()
+                    comp_link = c.get_attribute("href")
+                else:
+                    comp_name = ""
+                    comp_link = ""
+                long_results.append({
+                    "ScanOrder": idx,
+                    "Full Name": full_name,
+                    "Profile URL": val,
+                    "Title": job,
+                    "Company": comp_name,
+                    "Link": comp_link,
+                })
 
         time.sleep(DELAY_BETWEEN)
 
     driver.quit()
 
     # ——————————
-    # WRITE & FILTER CSV
+    # SAVE LONG FORM
     # ——————————
-    df_out = pd.DataFrame(
-        results,
-        columns=[
-            "Full Name",
-            "Profile URL",
-            "Current Title",
-            "Company",
-            "Company Link",
-        ],
+    df_long = pd.DataFrame(long_results)
+    df_long = df_long[df_long["Title"] != "Page Load Timeout"]
+
+    df_long.to_csv(resource_path(OUTPUT_CSV_LONG), index=False)
+    df_long.to_excel(resource_path(OUTPUT_XLSX_LONG), index=False, engine="openpyxl")
+    print("Saved long-form CSV & XLSX.")
+
+    # ——————————
+    # PIVOT TO WIDE FORM (preserves scan order)
+    # ——————————
+    grouped = (
+        df_long
+        .groupby(["ScanOrder", "Full Name", "Profile URL"], sort=False, dropna=False)
+        .agg({
+            "Title": list,
+            "Company": list,
+            "Link": list
+        })
+        .reset_index()
     )
-    # Drop timeout rows
-    df_out = df_out[df_out["Current Title"] != "Page Load Timeout"]
 
-    csv_path = resource_path(OUTPUT_CSV)
-    df_out.to_csv(csv_path, index=False)
-    print("Saved CSV to:", csv_path)
+    max_roles = grouped["Title"].map(len).max()
 
-    # ——————————
-    # CONVERT CSV → XLSX
-    # ——————————
-    df = pd.read_csv(csv_path)
-    xlsx_path = resource_path(OUTPUT_XLSX)
-    df.to_excel(xlsx_path, index=False, engine="openpyxl")
-    print("Saved Excel to:", xlsx_path)
+    for i in range(max_roles):
+        grouped[f"Title_{i+1}"] = grouped["Title"].apply(lambda L: L[i] if i < len(L) else "")
+        grouped[f"Company_{i+1}"] = grouped["Company"].apply(lambda L: L[i] if i < len(L) else "")
+        grouped[f"Link_{i+1}"] = grouped["Link"].apply(lambda L: L[i] if i < len(L) else "")
+
+    df_wide = (
+        grouped
+        .sort_values("ScanOrder")
+        .drop(columns=["ScanOrder", "Title", "Company", "Link"] )
+    )
+
+    df_wide.to_csv(resource_path(OUTPUT_CSV_WIDE), index=False)
+    df_wide.to_excel(resource_path(OUTPUT_XLSX_WIDE), index=False, engine="openpyxl")
+    print("Saved wide-form CSV & XLSX.")
 
 
 if __name__ == "__main__":
