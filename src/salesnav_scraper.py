@@ -73,14 +73,16 @@ def main():
 
         # Handle explicit "no prospect" entries
         if val.lower() == "no prospect linkedin":
-            long_results.append({
-                "ScanOrder": idx,
-                "Full Name": val,
-                "Profile URL": val,
-                "Title": val,
-                "Company": val,
-                "Link": val,
-            })
+            long_results.append(
+                {
+                    "ScanOrder": idx,
+                    "Full Name": val,
+                    "Profile URL": val,
+                    "Title": val,
+                    "Company": val,
+                    "Link": val,
+                }
+            )
             time.sleep(DELAY_BETWEEN)
             continue
 
@@ -89,14 +91,16 @@ def main():
             driver.get(val)
         except (TimeoutException, WebDriverException) as e:
             print(f"  → Page load failed: {e}")
-            long_results.append({
-                "ScanOrder": idx,
-                "Full Name": val,
-                "Profile URL": val,
-                "Title": "Page Load Timeout",
-                "Company": "Page Load Timeout",
-                "Link": "",
-            })
+            long_results.append(
+                {
+                    "ScanOrder": idx,
+                    "Full Name": val,
+                    "Profile URL": val,
+                    "Title": "Page Load Timeout",
+                    "Company": "Page Load Timeout",
+                    "Link": "",
+                }
+            )
             time.sleep(DELAY_BETWEEN)
             continue
 
@@ -122,40 +126,53 @@ def main():
                     (By.CSS_SELECTOR, "div[data-sn-view-name='lead-current-role']")
                 )
             )
-            titles = container.find_elements(By.CSS_SELECTOR, "span[data-anonymize='job-title']")
-            companies = container.find_elements(By.CSS_SELECTOR, "a[data-anonymize='company-name']")
+            # grab all titles
+            titles = container.find_elements(
+                By.CSS_SELECTOR, "span[data-anonymize='job-title']"
+            )
+            # grab all company names, whether link or plain text
+            companies = container.find_elements(
+                By.CSS_SELECTOR, "[data-anonymize='company-name']"
+            )
         except Exception:
             titles = []
             companies = []
 
-        # If none found, still emit one row
+        # emit at least one row
         if not titles:
-            long_results.append({
-                "ScanOrder": idx,
-                "Full Name": full_name,
-                "Profile URL": val,
-                "Title": "No title found",
-                "Company": "No company found",
-                "Link": "",
-            })
-        else:
-            for i, t in enumerate(titles):
-                job = t.text.strip() or "No title found"
-                if i < len(companies):
-                    c = companies[i]
-                    comp_name = c.text.strip()
-                    comp_link = c.get_attribute("href")
-                else:
-                    comp_name = ""
-                    comp_link = ""
-                long_results.append({
+            long_results.append(
+                {
                     "ScanOrder": idx,
                     "Full Name": full_name,
                     "Profile URL": val,
-                    "Title": job,
-                    "Company": comp_name,
-                    "Link": comp_link,
-                })
+                    "Title": "No title found",
+                    "Company": "No company found",
+                    "Link": "",
+                }
+            )
+        else:
+            for i, t in enumerate(titles):
+                job = t.text.strip() or "No title found"
+                # if a matching company element exists, take its text
+                if i < len(companies):
+                    c = companies[i]
+                    comp_name = c.text.strip() or ""
+                    # get href if it's an <a>, else empty
+                    comp_link = c.get_attribute("href") or ""
+                else:
+                    comp_name = ""
+                    comp_link = ""
+
+                long_results.append(
+                    {
+                        "ScanOrder": idx,
+                        "Full Name": full_name,
+                        "Profile URL": val,
+                        "Title": job,
+                        "Company": comp_name,
+                        "Link": comp_link,
+                    }
+                )
 
         time.sleep(DELAY_BETWEEN)
 
@@ -175,27 +192,28 @@ def main():
     # PIVOT TO WIDE FORM (preserves scan order)
     # ——————————
     grouped = (
-        df_long
-        .groupby(["ScanOrder", "Full Name", "Profile URL"], sort=False, dropna=False)
-        .agg({
-            "Title": list,
-            "Company": list,
-            "Link": list
-        })
+        df_long.groupby(
+            ["ScanOrder", "Full Name", "Profile URL"], sort=False, dropna=False
+        )
+        .agg({"Title": list, "Company": list, "Link": list})
         .reset_index()
     )
 
     max_roles = grouped["Title"].map(len).max()
 
     for i in range(max_roles):
-        grouped[f"Title_{i+1}"] = grouped["Title"].apply(lambda L: L[i] if i < len(L) else "")
-        grouped[f"Company_{i+1}"] = grouped["Company"].apply(lambda L: L[i] if i < len(L) else "")
-        grouped[f"Link_{i+1}"] = grouped["Link"].apply(lambda L: L[i] if i < len(L) else "")
+        grouped[f"Title_{i+1}"] = grouped["Title"].apply(
+            lambda L: L[i] if i < len(L) else ""
+        )
+        grouped[f"Company_{i+1}"] = grouped["Company"].apply(
+            lambda L: L[i] if i < len(L) else ""
+        )
+        grouped[f"Link_{i+1}"] = grouped["Link"].apply(
+            lambda L: L[i] if i < len(L) else ""
+        )
 
-    df_wide = (
-        grouped
-        .sort_values("ScanOrder")
-        .drop(columns=["ScanOrder", "Title", "Company", "Link"] )
+    df_wide = grouped.sort_values("ScanOrder").drop(
+        columns=["ScanOrder", "Title", "Company", "Link"]
     )
 
     df_wide.to_csv(resource_path(OUTPUT_CSV_WIDE), index=False)
