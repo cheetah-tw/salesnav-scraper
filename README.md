@@ -6,9 +6,9 @@
 ## Features
 
 - Headless scraping via Selenium
-- Obtains prospect full name, position title, current company, and company Sales Nav link
+- Obtains prospect full name, position title(s), current company(ies), and company Sales Nav link(s)
 - Bundles into a single EXE (Windows) or Mach-O binary (macOS)
-- Converts results to both **.csv** and **.xlsx**
+- Converts results to both **.csv** and **.xlsx** with multiple organizational methods
 
 ## Getting Started
 
