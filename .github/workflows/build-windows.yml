@@ -6,33 +6,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pyinstaller openpyxl python-dotenv selenium pandas numpy
+          python -m pip install --upgrade pyinstaller webdriver-manager python-dotenv selenium pandas openpyxl
 
-
-      - name: Build EXE
+      - name: Build SalesNavScraper.exe
         run: |
-          python -m PyInstaller --onefile --name SalesNavScraper --icon assets/scraper.ico src/salesnav_scraper.py
+          pyinstaller --clean --onefile \
+            --name SalesNavScraper \
+            --icon assets/scraper.ico \
+            src/salesnav_scraper.py
 
-      - name: Prepare zip bundle
+      - name: Package bundle
+        shell: powershell
         run: |
-          mkdir bundle
-          copy dist\SalesNavScraper.exe bundle\
-          copy cred.env bundle\
-          copy data\links.xlsx bundle\
-          powershell Compress-Archive -Path bundle\* -DestinationPath SalesNavScraper-windows.zip
+          Remove-Item -Recurse -Force bundle -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path bundle
+          Copy-Item dist\SalesNavScraper.exe bundle\
+          Copy-Item cred.env bundle\
+          Copy-Item data\links.xlsx bundle\
+          Compress-Archive -Path bundle\* -DestinationPath SalesNavScraper-windows.zip
 
       - name: Upload Windows bundle
         uses: actions/upload-artifact@v4

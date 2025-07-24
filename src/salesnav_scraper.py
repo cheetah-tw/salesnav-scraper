@@ -5,6 +5,8 @@ import pandas as pd
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -20,6 +22,15 @@ def resource_path(relative_path):
     else:
         base_dir = os.path.dirname(__file__)
     return os.path.join(base_dir, relative_path)
+
+
+def get_chrome_driver_path():
+    bundled = resource_path("chromedriver.exe")
+    # 1) if we’re frozen and you’ve bundled a driver, use it
+    if getattr(sys, "frozen", False) and os.path.exists(bundled):
+        return bundled
+    # 2) otherwise let webdriver‑manager fetch the matching one
+    return ChromeDriverManager().install()
 
 
 def main():
@@ -48,7 +59,9 @@ def main():
     # Selenium setup
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
-    driver = webdriver.Chrome(options=chrome_options)
+    driver_path = get_chrome_driver_path()
+    service = Service(driver_path)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.set_page_load_timeout(PAGE_TIMEOUT)
     wait = WebDriverWait(driver, LOAD_TIMEOUT)
 
