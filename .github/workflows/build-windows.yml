@@ -24,10 +24,7 @@ jobs:
 
       - name: Build SalesNavScraper.exe
         run: |
-          pyinstaller --clean --onefile \
-            --name SalesNavScraper \
-            --icon assets/scraper.ico \
-            src/salesnav_scraper.py
+          pyinstaller --clean --onefile --name SalesNavScraper --icon assets/scraper.ico src/salesnav_scraper.py
 
       - name: Package bundle
         shell: powershell

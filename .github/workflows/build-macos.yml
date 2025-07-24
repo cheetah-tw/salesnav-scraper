@@ -24,18 +24,15 @@ jobs:
 
       - name: Build macOS binary
         run: |
-          pyinstaller --clean --onefile \
-            --name SalesNavScraperMac \
-            --icon assets/scraper.icns \
-            src/salesnav_scraper.py
+          pyinstaller --clean --onefile --name SalesNavScraperMac --icon assets/scraper.icns src/salesnav_scraper.py
 
       - name: Package bundle
         run: |
           rm -rf bundle
           mkdir bundle
           cp dist/SalesNavScraperMac bundle/
-          cp cred.env                 bundle/
-          cp data/links.xlsx          bundle/
+          cp cred.env bundle/
+          cp data/links.xlsx bundle/
           zip -r SalesNavScraper-macos.zip bundle
 
       - name: Upload macOS bundle
